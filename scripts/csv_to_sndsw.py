@@ -70,6 +70,8 @@ tree.Branch('pdgf', pdgf, 'pdgf[2]/I')
 for index, row in df[df['particle_type']==32].iterrows():
      #print("index {}\n row {} \n".format(index,row))
     #print(df.iloc[index+1])
+    if df.shape[0]<index+2:
+        continue
     rowmu=df.iloc[index+1]
     rowmu2=df.iloc[index+2]
     if rowmu['particle_type']==-rowmu2['particle_type']:
