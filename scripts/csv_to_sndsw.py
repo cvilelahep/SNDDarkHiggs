@@ -65,7 +65,7 @@ tree.Branch('pyf', pyf, 'pyf[2]/D')
 tree.Branch('pzf', pzf, 'pzf[2]/D')
 tree.Branch('nf', nf, 'nf/I')
 tree.Branch('pdgf', pdgf, 'pdgf[2]/I')
-
+opangle=[]
 # Fill the TTree with the data from the DataFrame
 for index, row in df[df['particle_type']==32].iterrows():
      #print("index {}\n row {} \n".format(index,row))
@@ -84,8 +84,10 @@ for index, row in df[df['particle_type']==32].iterrows():
         nuel[0] = False
         vtxx[0] = row['vx']/1000
         vtxy[0] = row['vy']/1000
-        vtxz[0] = row['vz']/1000-10
-        vtxt[0] = row['vt']/1000-10
+        #vtxz[0] = row['vz']/1000-10
+        #vtxt[0] = row['vt']/1000-10
+        vtxz[0] = row['vz']/1000-480 #temporary for full length
+        vtxt[0] = row['vt']/1000-480
         El[0] = np.sqrt(row['px']**2+row['py']**2+row['pz']**2+row['m']**2)
         pxl[0] = row['px']
         pyl[0] = row['py']
@@ -102,8 +104,14 @@ for index, row in df[df['particle_type']==32].iterrows():
         pdgf[0]=rowmu['particle_type']
         pdgf[1]=rowmu2['particle_type']
         tree.Fill()
-        
+        opangle.append(np.arccos((rowmu['px']*rowmu2['px']+rowmu['py']*rowmu2['py']+rowmu['pz']*rowmu2['pz'])/(np.sqrt(rowmu['px']**2+rowmu['py']**2+rowmu['pz']**2)*np.sqrt(rowmu2['px']**2+rowmu2['py']**2+rowmu2['pz']**2))))
 print("Tree fill concluded, saving to output file")  
 # Write the TTree to the output file
 output_file.Write()
 output_file.Close()
+hist = ROOT.TH1F("OpAngle","OpAngle", 100,min(opangle),max(opangle))
+for value in opangle:
+    hist.Fill(value)
+c1=ROOT.TCanvas()
+hist.Draw()
+c1.SaveAs("OpAngleFromCsv.png")
