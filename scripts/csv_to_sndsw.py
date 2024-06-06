@@ -86,7 +86,7 @@ for index, row in df[df['particle_type']==32].iterrows():
         nuel[0] = False
         vtxx[0] = row['vx']/1000
         vtxy[0] = row['vy']/1000
-        vtxz[0] = row['vz']/1000+2.8 #temporary for indet
+        vtxz[0] = row['vz']/1000+2.8 #2.8 is the beginning of the detector
         vtxt[0] = row['vt']/1000+2.8
         El[0] = np.sqrt(row['px']**2+row['py']**2+row['pz']**2+row['m']**2)
         pxl[0] = row['px']
