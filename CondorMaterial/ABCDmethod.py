@@ -344,6 +344,10 @@ for i_event, [eventdigi,eventreco] in tqdm(enumerate(zip(treedigi,treereco))) :
 						hittheveto.append(1)
 					if (not veto) and (not reject):
 						hittheveto.append(0)
+	if len(muonhits)!=len(hittheveto):
+		print("Error: muonhits and hittheveto have different lengths")
+		exit()			
+
 	#if len(muonhits)>10:
 	#	break			
 
@@ -368,27 +372,27 @@ Abkg_error=array('d')
 Azone_list=array('d')
 Azone_error=array('d')
 threshold_list=array('d')
+logcountlist=[]
+f.write("\n no-veto approved \n")
+for i in range(len(muonhits)):
+	logcount=0
+	for plane in muonhits[i].keys():
+		muonhit_qdc=muonhits[i][plane]-shiftdict[int(muonhitsbar[i][plane])+int(plane)*10] if (args.shifted and (muonhitsbar[i][plane])+int(plane)*10 in shiftdict.keys()) else muonhits[i][plane]
+		if args.shifted and not ((muonhitsbar[i][plane])+int(plane)*10 in shiftdict.keys()):
+			continue
+		logcount+=np.log(p1.GetBinContent(int(int(muonhit_qdc)/2)+1)) if p1.GetBinContent(int(int(muonhit_qdc)/2)+1)!=0 else 0
+		logcount-=np.log(p2.GetBinContent(int(int(muonhit_qdc)/2)+1)) if p2.GetBinContent(int(int(muonhit_qdc)/2)+1)!=0 else 0
+	logcountlist.append(logcount)
+	if hittheveto[i]==0:
+		f.write("logcount={}\n".format(logcount))
 for logcount_threshold in tqdm(np.arange(-10,10,0.5)):
 	B,C,D,A_zone=0.,0.,0.,0.
 	threshold_list.append(logcount_threshold)
-	for i in range(len(muonhits)):
-		logcount=0
-		for plane in muonhits[i].keys():
-			muonhit_qdc=muonhits[i][plane]-shiftdict[int(muonhitsbar[i][plane])+int(plane)*10] if (args.shifted and (muonhitsbar[i][plane])+int(plane)*10 in shiftdict.keys()) else muonhits[i][plane]
-			if args.shifted and not ((muonhitsbar[i][plane])+int(plane)*10 in shiftdict.keys()):
-				continue
-			logcount+=np.log(p1.GetBinContent(int(int(muonhit_qdc)/2)+1)) if p1.GetBinContent(int(int(muonhit_qdc)/2)+1)!=0 else 0
-			logcount-=np.log(p2.GetBinContent(int(int(muonhit_qdc)/2)+1)) if p2.GetBinContent(int(int(muonhit_qdc)/2)+1)!=0 else 0
-
-		if logcount>=logcount_threshold and hittheveto[i]==1:
-			D+=1.
-		elif logcount<logcount_threshold and hittheveto[i]==1:
-			B+=1.
-		elif logcount>logcount_threshold and hittheveto[i]==0:
-			C+=1.
-		elif logcount<logcount_threshold and hittheveto[i]==0:
-			A_zone+=1.
-		Abkg=(C/D)*B if D!=0 else -1
+	D=len([logcount for logcount,veto in zip(logcountlist,hittheveto) if (logcount>=logcount_threshold and veto==1)])
+	B=len([logcount for logcount,veto in zip(logcountlist,hittheveto) if (logcount<logcount_threshold and veto==1)])
+	C=len([logcount for logcount,veto in zip(logcountlist,hittheveto) if (logcount>=logcount_threshold and veto==0)])
+	A_zone=len([logcount for logcount,veto in zip(logcountlist,hittheveto) if (logcount<logcount_threshold and veto==0)])
+	Abkg=(C/D)*B if D!=0 else -1
 	Abkg_list.append(Abkg)
 	Abkg_error.append(np.sqrt(Abkg))
 	Azone_list.append(A_zone)
