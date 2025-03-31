@@ -304,7 +304,7 @@ for i_event, [eventdigi,eventreco] in tqdm(enumerate(zip(treedigi,treereco))) :
 					reject=True
 					continue
 				if not reject and station_stats and tempmufiupplane:
-					branch_maxdisttotrack[0]=(max(maxhittrackdiffx,maxhittrackdiffy))
+					branch_maxdisttotrack[0]=(np.sqrt(max(maxhittrackdiffx,maxhittrackdiffy)))
 					branch_eventid[0]=eventdigi.EventHeader.GetEventNumber()
 					branch_vetocoords[0]=(vetocoords.X())
 					branch_vetocoords[1]=(vetocoords.Y())						
@@ -313,7 +313,7 @@ for i_event, [eventdigi,eventreco] in tqdm(enumerate(zip(treedigi,treereco))) :
 						branch_SciFihitsH[:]=[station_stats[i]["countx"] for i in station_stats]
 					if tempmufiupplane:
 						branch_UShits[:]=[tempmufiupplane[i] for i in tempmufiupplane]
-					branch_polarangle[0]=abs(trackangleXZ)+abs(trackangleYZ)
+					branch_polarangle[0]=np.sqrt(abs(trackangleXZ)**2+abs(trackangleYZ)**2)
 					logcount=0
 					for plane in bestqdcperplaneup.keys():
 						muonhit_qdc=bestqdcperplaneup[plane]-shiftdict[int(associatedbar[plane])+int(plane)*10] if (args.shifted and (associatedbar[plane])+int(plane)*10 in shiftdict.keys()) else bestqdcperplaneup[plane]

@@ -209,7 +209,6 @@ for i_event, [eventdigi,eventreco] in tqdm(enumerate(zip(treedigi,treereco))) :
 				hitcountscifi=0
 				maxhittrackdiffx=0
 				maxhittrackdiffy=0
-				init+=1
 				scifipassx,scifipassy=False,False		
 				for hit in eventdigi.Digi_ScifiHits:
 					if not hit.isValid():
