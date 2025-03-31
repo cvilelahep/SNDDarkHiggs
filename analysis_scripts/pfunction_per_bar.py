@@ -60,57 +60,6 @@ shiftdict[27]=20
 shiftdict[37]=-8
 shiftdict[7]=20
 shiftdict[17]=6
-'''shiftdict[2]=-18
-shiftdict[12]=-22
-shiftdict[22]=-16
-shiftdict[32]=-32
-shiftdict[43]=2
-shiftdict[0]=-18
-shiftdict[10]=-22
-shiftdict[20]=-22
-shiftdict[30]=-30
-shiftdict[40]=-4
-shiftdict[6]=-26
-shiftdict[16]=-24
-shiftdict[26]=-22
-shiftdict[36]=-32
-shiftdict[46]=22
-shiftdict[8]=-22
-shiftdict[18]=-26
-shiftdict[28]=-20
-shiftdict[38]=-36
-shiftdict[48]=6
-shiftdict[5]=-20
-shiftdict[15]=-30
-shiftdict[25]=-20
-shiftdict[35]=-34
-shiftdict[45]=4
-shiftdict[42]=26
-shiftdict[3]=-18
-shiftdict[13]=-26
-shiftdict[23]=-22
-shiftdict[33]=-34
-shiftdict[44]=24
-shiftdict[9]=-18
-shiftdict[19]=-26
-shiftdict[29]=-22
-shiftdict[39]=-34
-shiftdict[49]=10
-shiftdict[1]=-18
-shiftdict[11]=-24
-shiftdict[21]=-20
-shiftdict[31]=-32
-shiftdict[41]=4
-shiftdict[4]=-24
-shiftdict[14]=-26
-shiftdict[24]=-20
-shiftdict[34]=-34
-shiftdict[7]=-20
-shiftdict[17]=-22
-shiftdict[27]=-16
-shiftdict[37]=-30
-shiftdict[47]=-14
-'''
 
 if args.realdata:
 	treeinfoname="rawConv"
@@ -309,6 +258,9 @@ for i_event, [eventdigi,eventreco] in tqdm(enumerate(zip(treedigi,treereco))) :
 							continue
 					else:
 						sys.exit("Hit must have a system")
+					if bestqdcperplaneup:
+						muonhits.append(bestqdcperplaneup)
+						muonhitsbar.append(associatedbar)
 p1func={}
 p2func={}
 for i in range(len(muonhits)):
