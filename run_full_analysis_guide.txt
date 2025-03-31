@@ -1,0 +1,52 @@
+Before we start, some flags that work on most scripts that take dig.root files as input:
+    --f <FILE> if you want to input a single files
+    --usingdir if you want to use all dig.root files in all subdirectories of the current folder (initially used to easily chain neutrino MC files)
+    --realdata if you are using run data (changes cbmsim to rawConv) 
+
+
+Steps to follow:
+
+To run a run_data file from scratch (we only have the digitized and muon_tracked files):
+
+    1- python pfunction_per_bar.py --f <DIGFILE> --o <OFILE> --realdata
+        <OFILE> will be a root file filled with QDC histograms for each US bar (50 histograms maximum) 
+        lets say you named it <BAR_PFUNCS>
+
+    2- python pfunction_alignment.py --f <BAR_PFUNCS> --<OFILE>
+        <OFILE> will be a txt file, where you will get a new shiftdict in the following form:
+            shiftdict[ID]={SHIFT}" where ID is the 1-50 number IDing the bar, and SHIFT is the shift from the average mu
+        You now need to copy-paste this shiftdict, into your pfunctionmaker.py and any other scripts calculating QDC of hits, such as file_feature_skimmer.py
+        As a rule of thumb, if it has a previous shiftdict in the code, you should replace it. To activate the shift, you should now add the --shift flag
+
+    3- python pfunctionmaker.py --f <DIGFILE> --o <OFILE> --realdata --shift
+        <OFILE> will be a root file with 2 histograms, p1 and p2, the 2 p-functions
+
+You can start here if you are using previously generated pfunctions:
+
+    4-python file_feature_skimmer.py --f <DIGFILE> --pfunc <PFUNC_FILE> --o <OPTIONAL_OFILE> --shift
+        if no <OFILE> is given, <OFILE> has the same name as <DIGFILE> with an added "_skimmed" before the ".root"
+        example_dig.root becomes example_dig_skimmed.root
+    
+    5- The Optimizer script
+        this script has the following flags:
+
+            --sigf: the skimmed signal MC file
+            --nubkgf: the skimmed neutrino MC file
+            --mubkgf: the skimmed run data file OR --mubkgdir: a directory with skimmed run data files
+             
+            --o: optional outfile. If given, optimizer results saved at <OFILE>.txt else printed to terminal.
+             
+            --load: a loading flag, which can have 0 or 3 arguments:
+                with 0 arguments, it will assume ["DHArrs", "NuArrs", "DataArrs"] are the load files.
+                with 3 arguments, it will take them to be the DH, Nu and Data load file names
+                with a different number of arguments, it will raise an error and quit
+
+            --save: a saving flag, which can have 0 or 3 arguments:
+                with 0 arguments, it will assume ["DHArrs", "NuArrs", "DataArrs"] are the save files.
+                with 3 arguments, it will take them to be the DH, Nu and Data save file names
+                with a different number of arguments, it will raise an error and quit
+
+        loads and saves are done with .pkl files
+        --shift no longer required, since skimmed files have already NLLR calculated as a variable
+
+        "python cut_optimizer.py --load" will be the usual way to run the script 

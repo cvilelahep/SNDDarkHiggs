@@ -7,6 +7,7 @@ import pickle
 import scipy.stats
 import scipy
 import os
+import sys
 from skopt import gp_minimize
 from skopt import dump, load
 import random
@@ -53,6 +54,7 @@ parser.add_argument("--save", dest="saving", nargs="*", default=None)
 parser.add_argument("--load",dest="loading", nargs="*", default=None)
 parser.add_argument("--nubkgf",dest="nubkgfile",nargs="*")
 parser.add_argument("--mubkgf",dest="mubkgfile",nargs="*")
+parser.add_argument("--o",dest="outfile",nargs='?')
 parser.add_argument("--mubkgdir",dest="mubkgdir",default=None)
 args=parser.parse_args()
 #parsing save argument
@@ -426,16 +428,17 @@ if OPTIMIZER:
                     n_calls=100,         # the number of evaluations of f including at x0
                     n_random_starts=4,  # the number of random initial points
                     random_state=2701,
-                    verbose=True)          
+                    verbose=True)    
+    original_stdout=None 
+    if args.outfile:
+        f=open(f'{args.outfile}.txt', 'w')
+        # Save the current stdout (so you can restore it later)
+        original_stdout = sys.stdout
+        sys.stdout = f  # Redirect print() to the file
     check_thresholds(*result.x, x_offsetL=None, y_offsetL=None, printflag=True)
+    sys.stdout = original_stdout if original_stdout else None
 
-# After the code runs, check memory usage
-snapshot = tracemalloc.take_snapshot()
 
-# Print the top 10 memory usage statistics
-top_stats = snapshot.statistics('lineno')
-for stat in top_stats[:10]:
-    print(stat)
 
 
 
